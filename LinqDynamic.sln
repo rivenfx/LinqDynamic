@@ -1,0 +1,58 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{822481F8-DB04-4AB9-A775-9509193B5F83}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Riven.System.Linq.Dynamic.Core.Extensions", "src\Riven.System.Linq.Dynamic.Core.Extensions\Riven.System.Linq.Dynamic.Core.Extensions.csproj", "{DFD5ACF0-8FA8-4E21-AFC8-07BBFD7657C8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{5732F7A4-FAC8-4AC1-9747-CB7CD9CEEC8D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestApp", "tests\TestApp\TestApp.csproj", "{32F1EA0E-2523-4114-B180-E603724AEC6C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{598E39FA-13D1-48B2-B2EA-5436DC21DDB2}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		common.props = common.props
+		global.json = global.json
+		LICENSE = LICENSE
+		README.md = README.md
+		repository_info.props = repository_info.props
+		version.props = version.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nupkg", "nupkg", "{7E7349D6-1C73-4FC5-9CA8-10B8D43AFE7C}"
+	ProjectSection(SolutionItems) = preProject
+		nupkg\common.ps1 = nupkg\common.ps1
+		nupkg\pack.ps1 = nupkg\pack.ps1
+		nupkg\push_packages.ps1 = nupkg\push_packages.ps1
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DFD5ACF0-8FA8-4E21-AFC8-07BBFD7657C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFD5ACF0-8FA8-4E21-AFC8-07BBFD7657C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFD5ACF0-8FA8-4E21-AFC8-07BBFD7657C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFD5ACF0-8FA8-4E21-AFC8-07BBFD7657C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32F1EA0E-2523-4114-B180-E603724AEC6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32F1EA0E-2523-4114-B180-E603724AEC6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32F1EA0E-2523-4114-B180-E603724AEC6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32F1EA0E-2523-4114-B180-E603724AEC6C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DFD5ACF0-8FA8-4E21-AFC8-07BBFD7657C8} = {822481F8-DB04-4AB9-A775-9509193B5F83}
+		{32F1EA0E-2523-4114-B180-E603724AEC6C} = {5732F7A4-FAC8-4AC1-9747-CB7CD9CEEC8D}
+		{7E7349D6-1C73-4FC5-9CA8-10B8D43AFE7C} = {598E39FA-13D1-48B2-B2EA-5436DC21DDB2}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {55A1759D-DC9B-4ADC-B556-A2C33B98412A}
+	EndGlobalSection
+EndGlobal
