@@ -29,7 +29,9 @@ namespace System.Linq
         /// <returns>返回增加了筛选条件的查询器</returns>
         public static IQueryable<T> Where<T>(this IQueryable<T> query, IEnumerable<QueryCondition> queryConditions)
         {
-            if (query == null || queryConditions == null | queryConditions.Count() == 0)
+            if (query == null 
+                || queryConditions == null 
+                || queryConditions.Count() == 0)
             {
                 return query;
             }
