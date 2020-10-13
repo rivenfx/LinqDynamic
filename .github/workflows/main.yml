@@ -32,7 +32,8 @@ jobs:
             cd ./nupkg
             Write-Host $(pwd).Path
             ./pack.ps1
-            ls ./framework
+            $ls = ls ./framework
+            Write-Host $ls
             Write-Host '======= end pack ======= '
             
       # publish to nuget
@@ -45,5 +46,6 @@ jobs:
             cd ./nupkg
             Write-Host $(pwd).Path
             ./push_packages.ps1
-            ls ./framework
+            $ls = ls ./framework
+            Write-Host $ls
             Write-Host '======= end pack ======= '
