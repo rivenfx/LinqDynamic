@@ -28,7 +28,9 @@ jobs:
         with:
           script: |
             Write-Host '======= start pack ======= '
+            Write-Host $(pwd).Path
             cd ./nupkg
+            Write-Host $(pwd).Path
             ./pack.ps1
             Write-Host '======= end pack ======= '
             
@@ -38,6 +40,8 @@ jobs:
         with:
           script: |
             Write-Host '======= start pack ======= '
+            Write-Host $(pwd).Path
             cd ./nupkg
+            Write-Host $(pwd).Path
             ./push_packages.ps1
             Write-Host '======= end pack ======= '

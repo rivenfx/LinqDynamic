@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{822481F8-DB04-4AB9-A775-9509193B5F83}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Riven.System.Linq.Dynamic.Core.Extensions", "src\Riven.System.Linq.Dynamic.Core.Extensions\Riven.System.Linq.Dynamic.Core.Extensions.csproj", "{DFD5ACF0-8FA8-4E21-AFC8-07BBFD7657C8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Riven.System.Linq.Dynamic.Core.Extensions", "src\Riven.System.Linq.Dynamic.Core.Extensions\Riven.System.Linq.Dynamic.Core.Extensions.csproj", "{DFD5ACF0-8FA8-4E21-AFC8-07BBFD7657C8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{5732F7A4-FAC8-4AC1-9747-CB7CD9CEEC8D}"
 EndProject
@@ -17,6 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		common.props = common.props
 		global.json = global.json
 		LICENSE = LICENSE
+		.github\workflows\main.yml = .github\workflows\main.yml
 		README.md = README.md
 		repository_info.props = repository_info.props
 		version.props = version.props
