@@ -26,8 +26,10 @@ jobs:
       - name: build_nuget_packages
         run: ./pack.ps1
         shell: pwsh
+        working-directory: ./nupkg
             
       # publish to nuget
       - name: publish_to_nuget
         run: ./push_packages.ps1 ${{ secrets.ACCESS_TOKEN }}
         shell: pwsh
+        working-directory: ./nupkg
