@@ -1,4 +1,4 @@
-name: .NET Core
+name: "build and publish to nuget"
 
 on:
   push:
@@ -24,28 +24,10 @@ jobs:
 
       # build nuget packages
       - name: build_nuget_packages
-        uses: Amadevus/pwsh-script@v2.0.0
-        with:
-          script: |
-            Write-Host '======= start pack ======= '
-            Write-Host $(pwd).Path
-            cd ./nupkg
-            Write-Host $(pwd).Path
-            ./pack.ps1
-            $ls = ls ./framework
-            Write-Host $ls
-            Write-Host '======= end pack ======= '
+        run: ./pack.ps1
+        shell: pwsh
             
       # publish to nuget
       - name: publish_to_nuget
-        uses: Amadevus/pwsh-script@v2.0.0
-        with:
-          script: |
-            Write-Host '======= start pack ======= '
-            Write-Host $(pwd).Path
-            cd ./nupkg
-            Write-Host $(pwd).Path
-            ./push_packages.ps1
-            $ls = ls ./framework
-            Write-Host $ls
-            Write-Host '======= end pack ======= '
+        run: ./push_packages.ps1 ${{ secrets.ACCESS_TOKEN }}
+        shell: pwsh
