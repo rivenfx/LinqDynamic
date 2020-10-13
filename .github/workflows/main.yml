@@ -1,0 +1,43 @@
+name: .NET Core
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    # set os
+    runs-on: ubuntu-latest
+
+    steps:
+      # checkout souce code
+      - uses: actions/checkout@v2
+
+      # install dotnet sdk
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 3.1.100
+
+      # build nuget packages
+      - name: build_nuget_packages
+        uses: Amadevus/pwsh-script@v2.0.0
+        with:
+          script: |
+            Write-Host '======= start pack ======= '
+            cd ./nupkg
+            ./pack.ps1
+            Write-Host '======= end pack ======= '
+            
+      # publish to nuget
+      - name: publish_to_nuget
+        uses: Amadevus/pwsh-script@v2.0.0
+        with:
+          script: |
+            Write-Host '======= start pack ======= '
+            cd ./nupkg
+            ./push_packages.ps1
+            Write-Host '======= end pack ======= '
