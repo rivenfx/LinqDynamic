@@ -30,6 +30,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "nupkg", "nupkg", "{7E7349D6
 		nupkg\push_packages.ps1 = nupkg\push_packages.ps1
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{1720D801-9D32-47F8-B1C0-3A47F502CFD9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{7657840A-E802-4A5C-B52F-F5FF8D5678D5}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\build_and_publish_nuget.yml = .github\workflows\build_and_publish_nuget.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -52,6 +59,8 @@ Global
 		{DFD5ACF0-8FA8-4E21-AFC8-07BBFD7657C8} = {822481F8-DB04-4AB9-A775-9509193B5F83}
 		{32F1EA0E-2523-4114-B180-E603724AEC6C} = {5732F7A4-FAC8-4AC1-9747-CB7CD9CEEC8D}
 		{7E7349D6-1C73-4FC5-9CA8-10B8D43AFE7C} = {598E39FA-13D1-48B2-B2EA-5436DC21DDB2}
+		{1720D801-9D32-47F8-B1C0-3A47F502CFD9} = {598E39FA-13D1-48B2-B2EA-5436DC21DDB2}
+		{7657840A-E802-4A5C-B52F-F5FF8D5678D5} = {1720D801-9D32-47F8-B1C0-3A47F502CFD9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {55A1759D-DC9B-4ADC-B556-A2C33B98412A}
