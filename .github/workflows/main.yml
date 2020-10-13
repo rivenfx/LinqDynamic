@@ -30,6 +30,8 @@ jobs:
             
       # publish to nuget
       - name: publish_to_nuget
-        run: ./push_packages.ps1 ${{ secrets.ACCESS_TOKEN }}
+        env:
+          NUGET_KEY: ${{ secrets.NUGET_KEY }}
+        run: ./push_packages.ps1
         shell: pwsh
         working-directory: ./nupkg
