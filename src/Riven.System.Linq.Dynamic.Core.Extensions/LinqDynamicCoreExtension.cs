@@ -12,11 +12,14 @@ namespace System.Linq
     /// </summary>
     public static class LinqDynamicCoreExtensions
     {
-        static char[] SplitChar { get; set; }
+        const char FieldSplitChar = ',';
+        static char[] FieldSplitChars { get; set; }
+        static char[] ArraySplitChar { get; set; }
 
         static LinqDynamicCoreExtensions()
         {
-            SplitChar = new char[] { '|' };
+            FieldSplitChars = new char[] { FieldSplitChar };
+            ArraySplitChar = new char[] { '|' };
         }
 
 
@@ -29,8 +32,8 @@ namespace System.Linq
         /// <returns>返回增加了筛选条件的查询器</returns>
         public static IQueryable<T> Where<T>(this IQueryable<T> query, IEnumerable<QueryCondition> queryConditions)
         {
-            if (query == null 
-                || queryConditions == null 
+            if (query == null
+                || queryConditions == null
                 || queryConditions.Count() == 0)
             {
                 return query;
@@ -45,6 +48,13 @@ namespace System.Linq
 
             foreach (var condition in conditions)
             {
+                // 多字段列
+                if (condition.Field.Contains(FieldSplitChar))
+                {
+                    query = query.Where(condition.AsEnumerable());
+                    continue;
+                }
+
                 // 值等于空或空字符串
                 if (string.IsNullOrWhiteSpace(condition.Value))
                 {
@@ -112,7 +122,7 @@ namespace System.Linq
                     case QueryOperator.Between:
                         {
                             var values = condition.Value?.Split(
-                               SplitChar,
+                               ArraySplitChar,
                                StringSplitOptions.RemoveEmptyEntries
                             );
                             if (values == null || values.Length != 2)
@@ -132,7 +142,7 @@ namespace System.Linq
                     case QueryOperator.BetweenEqualStart:
                         {
                             var values = condition.Value?.Split(
-                               SplitChar,
+                               ArraySplitChar,
                                StringSplitOptions.RemoveEmptyEntries
                             );
                             if (values == null || values.Length != 2)
@@ -151,7 +161,7 @@ namespace System.Linq
                     case QueryOperator.BetweenEqualEnd:
                         {
                             var values = condition.Value?.Split(
-                               SplitChar,
+                               ArraySplitChar,
                                StringSplitOptions.RemoveEmptyEntries
                             );
                             if (values == null || values.Length != 2)
@@ -170,7 +180,7 @@ namespace System.Linq
                     case QueryOperator.BetweenEqualStartAndEnd:
                         {
                             var values = condition.Value?.Split(
-                               SplitChar,
+                               ArraySplitChar,
                                StringSplitOptions.RemoveEmptyEntries
                             );
                             if (values == null || values.Length != 2)
@@ -216,7 +226,7 @@ namespace System.Linq
             }
 
             var values = condition.Value.Split(
-                    SplitChar,
+                    ArraySplitChar,
                     StringSplitOptions.RemoveEmptyEntries
                 );
             if (values == null || values.Length == 0)
@@ -258,7 +268,7 @@ namespace System.Linq
             }
 
             var values = condition.Value.Split(
-                    SplitChar,
+                    ArraySplitChar,
                     StringSplitOptions.RemoveEmptyEntries
                 );
             if (values == null || values.Length == 0)
@@ -279,6 +289,32 @@ namespace System.Linq
 
 
             return query.Where(inFilter.ToString(), values);
+        }
+
+        /// <summary>
+        /// 多字段表达式转表达式迭代器
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <returns></returns>
+        public static IEnumerable<QueryCondition> AsEnumerable(this QueryCondition condition)
+        {
+            var fields = condition.Field
+                .Split(FieldSplitChars, StringSplitOptions.RemoveEmptyEntries)
+                .Select(o => o.Trim())
+                .Where(o => !string.IsNullOrWhiteSpace(o));
+
+            foreach (var field in fields)
+            {
+                yield return new QueryCondition()
+                {
+                    Field = field,
+                    Operator = condition.Operator,
+                    SkipValueIsNull = condition.SkipValueIsNull,
+                    Value = condition.Value
+                };
+            }
+
+            yield break;
         }
 
         /// <summary>
