@@ -83,7 +83,7 @@ namespace System.Linq
                     continue;
                 }
 
-                // 值不为空是
+                // 值不为空时
                 switch (condition.Operator)
                 {
                     case QueryOperator.Equal:
