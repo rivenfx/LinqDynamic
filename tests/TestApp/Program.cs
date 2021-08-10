@@ -83,11 +83,16 @@ namespace TestApp
             using (var scope = serviceProvider.CreateScope())
             {
                 var dbContext = scope.ServiceProvider.GetService<AppDbContext>();
+                var users = dbContext.Users.ToList();
+                dbContext.Users.RemoveRange(users);
+                dbContext.SaveChanges();
+
                 if (dbContext.Users.Count() == 0)
                 {
                     dbContext.Add(new User()
                     {
                         Name = "ObjectA",
+                        Desc = "ObjectA",
                         CreationTime = DateTime.Parse("2020-08-01 00:00:00"),
                         IsActive = true,
                         CanNullVal = 1
@@ -96,6 +101,7 @@ namespace TestApp
                     dbContext.Add(new User()
                     {
                         Name = "ObjectB",
+                        Desc = "ObjectB",
                         CreationTime = DateTime.Parse("2020-08-05 00:00:00"),
                         IsActive = true,
                         CanNullVal = 2
@@ -104,6 +110,7 @@ namespace TestApp
                     dbContext.Add(new User()
                     {
                         Name = "ObjectC",
+                        Desc = "ObjectC",
                         CreationTime = DateTime.Parse("2020-08-10 00:00:00"),
                         IsActive = false
                     });
@@ -111,6 +118,7 @@ namespace TestApp
                     dbContext.Add(new User()
                     {
                         Name = "TestA",
+                        Desc = "TestA",
                         CreationTime = DateTime.Parse("2020-08-11 00:00:00"),
                         IsActive = false
                     });
@@ -118,6 +126,7 @@ namespace TestApp
                     dbContext.Add(new User()
                     {
                         Name = "TestB",
+                        Desc = "TestB",
                         CreationTime = DateTime.Parse("2020-08-12 00:00:00"),
                         IsActive = false
                     });
@@ -170,22 +179,22 @@ namespace TestApp
                 var queryConds = new List<QueryCondition>();
                 queryConds.Add(new QueryCondition()
                 {
-                    Field = "Name",
-                    Operator = QueryOperator.NotEqual,
-                    Value = "ObjectC"
+                    Field = "or|Name,Desc",
+                    Operator = QueryOperator.Contains,
+                    Value = "Object"
                 });
-                queryConds.Add(new QueryCondition()
-                {
-                    Field = "CreationTime",
-                    Operator = QueryOperator.BetweenEqualStart,
-                    Value = "2020-08-01 00:00:00|2020-08-20 00:00:00"
-                });
-                queryConds.Add(new QueryCondition()
-                {
-                    Field = "Name",
-                    Operator = QueryOperator.In,
-                    Value = "TestA|TestB"
-                });
+                //queryConds.Add(new QueryCondition()
+                //{
+                //    Field = "CreationTime",
+                //    Operator = QueryOperator.BetweenEqualStart,
+                //    Value = "2020-08-01 00:00:00|2020-08-20 00:00:00"
+                //});
+                //queryConds.Add(new QueryCondition()
+                //{
+                //    Field = "Name",
+                //    Operator = QueryOperator.In,
+                //    Value = "TestA|TestB"
+                //});
 
                 var v9 = query.Where(queryConds).ToList();
             }
