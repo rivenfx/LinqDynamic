@@ -18,6 +18,7 @@ namespace System.Linq
         /// 字段名称 
         /// xxx
         /// xxx.xxx
+        /// (多字段使用,分隔： xxx,xxx)
         /// </summary>
         public string Field { get; set; }
 
