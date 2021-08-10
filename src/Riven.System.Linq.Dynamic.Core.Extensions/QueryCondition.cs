@@ -39,5 +39,10 @@ namespace System.Linq
         /// 为false时,<see cref="Value"/>为空不跳过此条件
         /// </summary>
         public bool SkipValueIsNull { get; set; }
+
+        public virtual string JoinString()
+        {
+            return Field.StartsWith("or|") ? "or" : "and";
+        }
     }
 }
