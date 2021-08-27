@@ -360,19 +360,5 @@ namespace System.Linq
             return query.OrderBy(ordersStr.ToString());
 
         }
-
-
-        /// <summary>
-        /// 分页
-        /// </summary>
-        /// <typeparam name="T">类型</typeparam>
-        /// <param name="query">查询器</param>
-        /// <param name="pageNumber">页码</param>
-        /// <param name="pageSize">页面数据总量</param>
-        /// <returns>返回增加了分页的查询器</returns>
-        public static IQueryable<T> PageBy<T>(this IQueryable<T> query, int pageNumber, int pageSize)
-        {
-            return query.Page(pageNumber, pageSize);
-        }
     }
 }
