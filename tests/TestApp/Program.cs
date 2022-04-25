@@ -88,6 +88,7 @@ namespace TestApp
                     dbContext.Add(new User()
                     {
                         Name = "ObjectA",
+                        Desc = "A",
                         CreationTime = DateTime.Parse("2020-08-01 00:00:00"),
                         IsActive = true,
                         CanNullVal = 1
@@ -96,6 +97,7 @@ namespace TestApp
                     dbContext.Add(new User()
                     {
                         Name = "ObjectB",
+                        Desc = "B",
                         CreationTime = DateTime.Parse("2020-08-05 00:00:00"),
                         IsActive = true,
                         CanNullVal = 2
@@ -104,6 +106,7 @@ namespace TestApp
                     dbContext.Add(new User()
                     {
                         Name = "ObjectC",
+                        Desc = "C",
                         CreationTime = DateTime.Parse("2020-08-10 00:00:00"),
                         IsActive = false
                     });
@@ -111,6 +114,7 @@ namespace TestApp
                     dbContext.Add(new User()
                     {
                         Name = "TestA",
+                        Desc = "A",
                         CreationTime = DateTime.Parse("2020-08-11 00:00:00"),
                         IsActive = false
                     });
@@ -118,6 +122,7 @@ namespace TestApp
                     dbContext.Add(new User()
                     {
                         Name = "TestB",
+                        Desc = "B",
                         CreationTime = DateTime.Parse("2020-08-12 00:00:00"),
                         IsActive = false
                     });
@@ -185,6 +190,12 @@ namespace TestApp
                     Field = "Name",
                     Operator = QueryOperator.In,
                     Value = "TestA|TestB"
+                });
+                queryConds.Add(new QueryCondition()
+                {
+                    Field = "Name|Desc",
+                    Operator = QueryOperator.In,
+                    Value = "A"
                 });
 
                 var v9 = query.Where(queryConds).ToList();

@@ -14,6 +14,7 @@ namespace TestApp.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(nullable: true),
+                    Desc = table.Column<string>(nullable: true),
                     IsActive = table.Column<bool>(nullable: false),
                     CreationTime = table.Column<DateTime>(nullable: false),
                     CanNullVal = table.Column<long>(nullable: true)
