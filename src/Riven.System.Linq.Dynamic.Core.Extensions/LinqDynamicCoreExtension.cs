@@ -12,7 +12,7 @@ namespace System.Linq
     /// </summary>
     public static class LinqDynamicCoreExtensions
     {
-        const char FieldSplitChar = ',';
+        const char FieldSplitChar = '|';
         const char ArraySplitChar = '|';
         static char[] FieldSplitChars { get; set; }
         static char[] ArraySplitChars { get; set; }
@@ -47,31 +47,23 @@ namespace System.Linq
                 return query;
             }
 
-            var filterTextBuilder = new StringBuilder();
+
             var args = new List<object>();
-
-
-            var condationList = conditions.ToList();
-            var latestIndex = condationList.Count - 1;
-            for (int i = 0; i < condationList.Count; i++)
+            var filterList = new List<string>();
+            foreach (var condition in conditions)
             {
-                var condition = condationList[i];
-                var filterText = condition.ToString(args);
-                if (string.IsNullOrWhiteSpace(filterText))
+                var filterItem = condition.ToString(args);
+                if (string.IsNullOrWhiteSpace(filterItem))
                 {
                     continue;
                 }
-                filterTextBuilder.Append("(");
-                filterTextBuilder.Append(filterText);
-                filterTextBuilder.Append(")");
-                if (i != latestIndex)
-                {
-                    filterTextBuilder.Append(" and ");
-                }
+                filterList.Add(filterItem);
             }
 
+            var filterText = string.Join(" and ", filterList);
+
             return query.Where(
-                filterTextBuilder.ToString(),
+                filterText,
                 args.ToArray()
                 );
         }
@@ -154,7 +146,7 @@ namespace System.Linq
                 // 如果要跳过为空
                 if (condition.SkipValueIsNull)
                 {
-                    return string.Empty;
+                    goto end;
                 }
 
                 // 如果操作类型不是 "相等" 或 "不相等"
@@ -171,7 +163,21 @@ namespace System.Linq
                             break;
                     }
                 }
-                return result;
+                goto end;
+            }
+
+            // 多字段
+            if (condition.Field.Contains(FieldSplitChar))
+            {
+                var conditions = condition.AsEnumerable();
+                var filterList = new List<string>();
+                foreach (var item in conditions)
+                {
+                    filterList.Add(item.ToString(args));
+                }
+
+                result = string.Join(" or ", filterList);
+                goto end;
             }
 
 
@@ -329,7 +335,40 @@ namespace System.Linq
                     throw new ArgumentException($"Unsupported filter operation type: {condition.Operator}");
             }
 
+
+        end:
+            if (!string.IsNullOrWhiteSpace(result))
+            {
+                return $"({result})";
+            }
+
             return result;
+        }
+
+        /// <summary>
+        /// 多字段表达式转表达式迭代器
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <returns></returns>
+        public static IEnumerable<QueryCondition> AsEnumerable(this QueryCondition condition)
+        {
+            var fields = condition.Field
+                .Split(FieldSplitChars, StringSplitOptions.RemoveEmptyEntries)
+                .Select(o => o.Trim())
+                .Where(o => !string.IsNullOrWhiteSpace(o));
+
+            foreach (var field in fields)
+            {
+                yield return new QueryCondition()
+                {
+                    Field = field,
+                    Operator = condition.Operator,
+                    SkipValueIsNull = condition.SkipValueIsNull,
+                    Value = condition.Value
+                };
+            }
+
+            yield break;
         }
 
         #endregion
