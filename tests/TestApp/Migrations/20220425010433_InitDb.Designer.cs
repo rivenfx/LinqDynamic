@@ -10,7 +10,7 @@ using TestApp.Database;
 namespace TestApp.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20200814060526_InitDb")]
+    [Migration("20220425010433_InitDb")]
     partial class InitDb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -33,6 +33,9 @@ namespace TestApp.Migrations
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Desc")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");

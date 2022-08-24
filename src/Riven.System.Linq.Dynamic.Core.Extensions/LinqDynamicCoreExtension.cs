@@ -12,16 +12,18 @@ namespace System.Linq
     /// </summary>
     public static class LinqDynamicCoreExtensions
     {
-        const char FieldSplitChar = ',';
+        const char FieldSplitChar = '|';
+        const char ArraySplitChar = '|';
         static char[] FieldSplitChars { get; set; }
-        static char[] ArraySplitChar { get; set; }
+        static char[] ArraySplitChars { get; set; }
 
         static LinqDynamicCoreExtensions()
         {
             FieldSplitChars = new char[] { FieldSplitChar };
-            ArraySplitChar = new char[] { '|' };
+            ArraySplitChars = new char[] { ArraySplitChar };
         }
 
+        #region 筛选
 
         /// <summary>
         /// 根据筛选条件对象创建筛选
@@ -46,164 +48,24 @@ namespace System.Linq
             }
 
 
+            var args = new List<object>();
+            var filterList = new List<string>();
             foreach (var condition in conditions)
             {
-                // 多字段列
-                if (condition.Field.Contains(FieldSplitChar))
+                var filterItem = condition.ToString(args);
+                if (string.IsNullOrWhiteSpace(filterItem))
                 {
-                    query = query.Where(condition.AsEnumerable());
                     continue;
                 }
-
-                // 值等于空或空字符串
-                if (string.IsNullOrWhiteSpace(condition.Value))
-                {
-
-                    // 如果要跳过为空
-                    if (condition.SkipValueIsNull)
-                    {
-                        continue;
-                    }
-
-                    // 如果操作类型不是 "相等" 或 "不相等"
-                    if (condition.Operator == QueryOperator.Equal
-                        || condition.Operator == QueryOperator.NotEqual)
-                    {
-                        switch (condition.Operator)
-                        {
-                            case QueryOperator.Equal:
-                                query = query.Where($"{condition.Field} == null", condition.Value);
-                                break;
-                            case QueryOperator.NotEqual:
-                                query = query.Where($"{condition.Field} != null", condition.Value);
-                                break;
-
-                        }
-                    }
-                    continue;
-                }
-
-                // 值不为空是
-                switch (condition.Operator)
-                {
-                    case QueryOperator.Equal:
-                        query = query.Where($"{condition.Field} == @0", condition.Value);
-                        break;
-                    case QueryOperator.NotEqual:
-                        query = query.Where($"{condition.Field} != @0", condition.Value);
-                        break;
-                    case QueryOperator.Greater:
-                        query = query.Where($"{condition.Field} > @0", condition.Value);
-                        break;
-                    case QueryOperator.GreaterEqual:
-                        query = query.Where($"{condition.Field} >= @0", condition.Value);
-                        break;
-                    case QueryOperator.Less:
-                        query = query.Where($"{condition.Field} < @0", condition.Value);
-                        break;
-                    case QueryOperator.LessEqual:
-                        query = query.Where($"{condition.Field} <= @0", condition.Value);
-                        break;
-                    case QueryOperator.StartsWith:
-                        query = query.Where($"{condition.Field}.StartsWith(@0)", condition.Value);
-                        break;
-                    case QueryOperator.EndsWith:
-                        query = query.Where($"{condition.Field}.EndsWith(@0)", condition.Value);
-                        break;
-                    case QueryOperator.In:
-                        query = query.WhereIn(condition);
-                        break;
-                    case QueryOperator.NotIn:
-                        query = query.WhereNotIn(condition);
-                        break;
-                    case QueryOperator.Contains:
-                        query = query.Where($"{condition.Field}.Contains(@0)", condition.Value);
-                        break;
-                    case QueryOperator.Between:
-                        {
-                            var values = condition.Value?.Split(
-                               ArraySplitChar,
-                               StringSplitOptions.RemoveEmptyEntries
-                            );
-                            if (values == null || values.Length != 2)
-                            {
-                                throw new ArgumentException(
-                                        $"Incorrect number of filter values after splitting: {condition.Value}"
-                                    );
-                            }
-
-                            query = query.Where(
-                                    $"{condition.Field} > @0 and {condition.Field} < @1",
-                                    values[0],
-                                    values[1]
-                                );
-                        }
-                        break;
-                    case QueryOperator.BetweenEqualStart:
-                        {
-                            var values = condition.Value?.Split(
-                               ArraySplitChar,
-                               StringSplitOptions.RemoveEmptyEntries
-                            );
-                            if (values == null || values.Length != 2)
-                            {
-                                throw new ArgumentException(
-                                        $"Incorrect number of filter values after splitting: {condition.Value}"
-                                    );
-                            }
-                            query = query.Where(
-                                    $"{condition.Field} >= @0 and {condition.Field} < @1",
-                                    values[0],
-                                    values[1]
-                                );
-                        }
-                        break;
-                    case QueryOperator.BetweenEqualEnd:
-                        {
-                            var values = condition.Value?.Split(
-                               ArraySplitChar,
-                               StringSplitOptions.RemoveEmptyEntries
-                            );
-                            if (values == null || values.Length != 2)
-                            {
-                                throw new ArgumentException(
-                                        $"Incorrect number of filter values after splitting: {condition.Value}"
-                                    );
-                            }
-                            query = query.Where(
-                                    $"{condition.Field} > @0 and {condition.Field} <= @1",
-                                    values[0],
-                                    values[1]
-                                );
-                        }
-                        break;
-                    case QueryOperator.BetweenEqualStartAndEnd:
-                        {
-                            var values = condition.Value?.Split(
-                               ArraySplitChar,
-                               StringSplitOptions.RemoveEmptyEntries
-                            );
-                            if (values == null || values.Length != 2)
-                            {
-                                throw new ArgumentException(
-                                        $"Incorrect number of filter values after splitting: {condition.Value}"
-                                    );
-                            }
-                            query = query.Where(
-                                    $"{condition.Field} >= @0 and {condition.Field} <= @1",
-                                    values[0],
-                                    values[1]
-                                );
-                        }
-                        break;
-                    default:
-                        throw new ArgumentException($"Unsupported filter operation type: {condition.Operator}");
-                }
-
+                filterList.Add(filterItem);
             }
 
+            var filterText = string.Join(" and ", filterList);
 
-            return query;
+            return query.Where(
+                filterText,
+                args.ToArray()
+                );
         }
 
 
@@ -225,28 +87,16 @@ namespace System.Linq
                 return query;
             }
 
-            var values = condition.Value.Split(
-                    ArraySplitChar,
-                    StringSplitOptions.RemoveEmptyEntries
-                );
-            if (values == null || values.Length == 0)
+
+            var args = new List<object>();
+            var filterString = condition.ToString(args);
+
+            if (string.IsNullOrEmpty(filterString))
             {
                 return query;
             }
 
-            var inFilter = new StringBuilder();
-            var index = 0;
-            for (int i = 0; i < values.Length; i++)
-            {
-                if (i > 0)
-                {
-                    inFilter.Append(" or ");
-                }
-                inFilter.Append($"{condition.Field} == @{index++}");
-            }
-
-
-            return query.Where(inFilter.ToString(), values);
+            return query.Where(filterString, args);
         }
 
         /// <summary>
@@ -267,28 +117,232 @@ namespace System.Linq
                 return query;
             }
 
-            var values = condition.Value.Split(
-                    ArraySplitChar,
-                    StringSplitOptions.RemoveEmptyEntries
-                );
-            if (values == null || values.Length == 0)
+            var args = new List<object>();
+            var filterString = condition.ToString(args);
+
+            if (string.IsNullOrEmpty(filterString))
             {
                 return query;
             }
 
-            var inFilter = new StringBuilder();
-            var index = 0;
-            for (int i = 0; i < values.Length; i++)
+            return query.Where(filterString, args);
+        }
+
+
+        /// <summary>
+        /// 查询表达式转字符串，并将值添加到参数数组中
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
+        public static string ToString(this QueryCondition condition, List<object> args)
+        {
+            var result = string.Empty;
+
+            // 值等于空或空字符串
+            if (string.IsNullOrWhiteSpace(condition.Value))
             {
-                if (i > 0)
+                // 如果要跳过为空
+                if (condition.SkipValueIsNull)
                 {
-                    inFilter.Append(" and ");
+                    goto end;
                 }
-                inFilter.Append($"{condition.Field} != @{index++}");
+
+                // 如果操作类型不是 "相等" 或 "不相等"
+                if (condition.Operator == QueryOperator.Equal
+                    || condition.Operator == QueryOperator.NotEqual)
+                {
+                    switch (condition.Operator)
+                    {
+                        case QueryOperator.Equal:
+                            result = $"{condition.Field} == null";
+                            break;
+                        case QueryOperator.NotEqual:
+                            result = $"{condition.Field} != null";
+                            break;
+                    }
+                }
+                goto end;
+            }
+
+            // 多字段
+            if (condition.Field.Contains(FieldSplitChar))
+            {
+                var conditions = condition.AsEnumerable();
+                var filterList = new List<string>();
+                foreach (var item in conditions)
+                {
+                    filterList.Add(item.ToString(args));
+                }
+
+                result = string.Join(" or ", filterList);
+                goto end;
             }
 
 
-            return query.Where(inFilter.ToString(), values);
+            // 值不为空时
+            switch (condition.Operator)
+            {
+                case QueryOperator.Equal:
+                    result = $"{condition.Field} == @{args.Count}";
+                    args.Add(condition.Value);
+                    break;
+                case QueryOperator.NotEqual:
+                    result = $"{condition.Field} != @{args.Count}";
+                    args.Add(condition.Value);
+                    break;
+                case QueryOperator.Greater:
+                    result = $"{condition.Field} > @{args.Count}";
+                    args.Add(condition.Value);
+                    break;
+                case QueryOperator.GreaterEqual:
+                    result = $"{condition.Field} >= @{args.Count}";
+                    args.Add(condition.Value);
+                    break;
+                case QueryOperator.Less:
+                    result = $"{condition.Field} < @{args.Count}";
+                    args.Add(condition.Value);
+                    break;
+                case QueryOperator.LessEqual:
+                    result = $"{condition.Field} <= @{args.Count}";
+                    args.Add(condition.Value);
+                    break;
+                case QueryOperator.StartsWith:
+                    result = $"{condition.Field}.StartsWith(@{args.Count})";
+                    args.Add(condition.Value);
+                    break;
+                case QueryOperator.EndsWith:
+                    result = $"{condition.Field}.EndsWith(@{args.Count})";
+                    args.Add(condition.Value);
+                    break;
+                case QueryOperator.Contains:
+                    result = $"{condition.Field}.Contains(@{args.Count})";
+                    args.Add(condition.Value);
+                    break;
+                case QueryOperator.Between:
+                    {
+                        var values = condition.Value?.Split(
+                           ArraySplitChars,
+                           StringSplitOptions.RemoveEmptyEntries
+                        );
+                        if (values == null || values.Length != 2)
+                        {
+                            throw new ArgumentException(
+                                    $"Incorrect number of filter values after splitting: {condition.Value}"
+                                );
+                        }
+                        result = $"{condition.Field} > @{args.Count} and {condition.Field} < @{args.Count + 1}";
+                        args.Add(values[0]);
+                        args.Add(values[1]);
+                    }
+                    break;
+                case QueryOperator.BetweenEqualStart:
+                    {
+                        var values = condition.Value?.Split(
+                           ArraySplitChars,
+                           StringSplitOptions.RemoveEmptyEntries
+                        );
+                        if (values == null || values.Length != 2)
+                        {
+                            throw new ArgumentException(
+                                    $"Incorrect number of filter values after splitting: {condition.Value}"
+                                );
+                        }
+                        result = $"{condition.Field} >= @{args.Count} and {condition.Field} < @{args.Count + 1}";
+                        args.Add(values[0]);
+                        args.Add(values[1]);
+                    }
+                    break;
+                case QueryOperator.BetweenEqualEnd:
+                    {
+                        var values = condition.Value?.Split(
+                           ArraySplitChars,
+                           StringSplitOptions.RemoveEmptyEntries
+                        );
+                        if (values == null || values.Length != 2)
+                        {
+                            throw new ArgumentException(
+                                    $"Incorrect number of filter values after splitting: {condition.Value}"
+                                );
+                        }
+
+                        result = $"{condition.Field} > @{args.Count} and {condition.Field} <= @{args.Count + 1}";
+                        args.Add(values[0]);
+                        args.Add(values[1]);
+                    }
+                    break;
+                case QueryOperator.BetweenEqualStartAndEnd:
+                    {
+                        var values = condition.Value?.Split(
+                           ArraySplitChars,
+                           StringSplitOptions.RemoveEmptyEntries
+                        );
+                        if (values == null || values.Length != 2)
+                        {
+                            throw new ArgumentException(
+                                    $"Incorrect number of filter values after splitting: {condition.Value}"
+                                );
+                        }
+                        result = $"{condition.Field} >= @{args.Count} and {condition.Field} <= @{args.Count + 1}";
+                        args.Add(values[0]);
+                        args.Add(values[1]);
+                    }
+                    break;
+                case QueryOperator.In:
+                    {
+                        var values = condition.Value.Split(
+                                ArraySplitChars,
+                                StringSplitOptions.RemoveEmptyEntries
+                        );
+
+                        if (values == null || values.Length == 0)
+                        {
+                            return string.Empty;
+                        }
+
+                        var inFilter = new StringBuilder();
+                        var latestIndex = values.Length - 1;
+                        for (int i = 0; i < values.Length; i++)
+                        {
+                            inFilter.Append($"{condition.Field} == @{args.Count}");
+                            if (i != latestIndex)
+                            {
+                                inFilter.Append(" or ");
+                            }
+                            args.Add(values[i]);
+                        }
+
+                        result = inFilter.ToString();
+                    }
+                    break;
+                case QueryOperator.NotIn:
+                    {
+                        var conditionTmp = new QueryCondition()
+                        {
+                            Field = condition.Field,
+                            Operator = QueryOperator.In,
+                            SkipValueIsNull = true,
+                            Value = condition.Value,
+                        };
+
+                        result = conditionTmp.ToString(args)
+                             .Replace(" == ", " != ")
+                             .Replace(" or ", " and ");
+                    }
+                    break;
+                default:
+                    throw new ArgumentException($"Unsupported filter operation type: {condition.Operator}");
+            }
+
+
+        end:
+            if (!string.IsNullOrWhiteSpace(result))
+            {
+                return $"({result})";
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -316,6 +370,11 @@ namespace System.Linq
 
             yield break;
         }
+
+        #endregion
+
+
+        #region 排序
 
         /// <summary>
         /// 根据排序条件进行排序
@@ -360,5 +419,7 @@ namespace System.Linq
             return query.OrderBy(ordersStr.ToString());
 
         }
+
+        #endregion
     }
 }
