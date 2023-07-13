@@ -60,6 +60,12 @@ namespace System.Linq
                 filterList.Add(filterItem);
             }
 
+            // 没有筛选条件就直接跳过
+            if (filterList.Count == 0)
+            {
+                return query;
+            }
+
             var filterText = string.Join(" and ", filterList);
 
             return query.Where(
